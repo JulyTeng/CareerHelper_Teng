@@ -3,37 +3,37 @@ name: CI - Continuous Integration
 # 触发条件：当有代码推送或PR时
 on:
   push:
-    branches: [ main, develop ]
+    branches: [master, develop]
   pull_request:
-    branches: [ main ]
+    branches: [master]
 
 jobs:
   # Job 1: 代码质量检查
   lint:
     name: Code Quality Check
     runs-on: ubuntu-latest
-    
+
     steps:
       # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       # 2. 设置Node.js环境
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       # 3. 安装依赖
       - name: Install dependencies
         run: |
           npm install -g htmlhint stylelint stylelint-config-standard
-      
+
       # 4. HTML代码检查
       - name: Lint HTML
         run: |
           htmlhint "*.html" || echo "HTML检查完成"
-      
+
       # 5. CSS代码检查
       - name: Lint CSS
         run: |
@@ -44,12 +44,12 @@ jobs:
   build:
     name: Build Validation
     runs-on: ubuntu-latest
-    needs: lint  # 依赖lint job完成
-    
+    needs: lint # 依赖lint job完成
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Verify project structure
         run: |
           echo "✅ 验证项目结构..."
@@ -57,7 +57,7 @@ jobs:
           test -f styles.css && echo "✓ styles.css 存在"
           test -f script.js && echo "✓ script.js 存在"
           test -d assets && echo "✓ assets 文件夹存在"
-      
+
       - name: Check file sizes
         run: |
           echo "📊 检查文件大小..."
@@ -72,11 +72,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'pull_request'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Create deployment message
         run: |
           echo "🚀 准备部署预览环境..."
@@ -88,11 +88,11 @@ jobs:
   security:
     name: Security Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Check for sensitive data
         run: |
           echo "🔒 检查敏感信息..."
@@ -103,4 +103,3 @@ jobs:
           else
             echo "✅ 未发现敏感信息"
           fi
-
